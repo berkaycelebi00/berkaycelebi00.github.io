@@ -1,6 +1,10 @@
 title: Berkay Çelebi
 description: Siber Güvenlik - CTF WriteUp - Sanal Makine CTF.
 show_downloads: true
+<<<<<<< HEAD
 google_analytics: G-GFWHEDLNKB
+=======
+google_analytics: G-CMN1Z1RV2Y
+>>>>>>> 4b8cec8dfd13391353aa935dc6929f9e3cf3790e
 remote-theme: jekyll-theme-hacker
 #theme: jekyll-theme-hacker
