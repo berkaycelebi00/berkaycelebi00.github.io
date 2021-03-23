@@ -19,10 +19,13 @@
         <h2>{{ site.description | default: site.github.project_tagline }}</h2>
 
         <section id="downloads">
-         
-          <a href="{{ site.github.repository_url }}" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+            <a href="{{ '/' | relative_url }}" style="margin-left: 10%;"><span class="icon" ></span>Ana Sayfa</a>
+            <a href="{{ '/about.html' | relative_url }}"><span class="icon" ></span>Hakkımda</a>
+            <a href="{{ site.github.repository_url }}" class="btn btn-github" style="margin-left: 10%;"><span class="icon"></span>GitHub</a>           
         </section>
+         
       </div>
+      
     </header>
 
     <div class="container">
